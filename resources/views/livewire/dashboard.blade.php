@@ -92,112 +92,161 @@
                         {{-- Project Details Section --}}
                         <div x-show="open" x-cloak class="border-t border-gray-200 dark:border-gray-700">
                             @foreach ($project->environments as $environment)
-                                <div class="p-4 bg-gray-50 dark:bg-coolgray-200 m-4 rounded-lg">
+                                <div class="m-4" x-data="{
+                                    envOpen: false,
+                                    applicationsOpen: false,
+                                    servicesOpen: false,
+                                    databasesOpen: false
+                                }">
                                     {{-- Environment Header --}}
-                                    <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center justify-between p-4 bg-white dark:bg-coolgray-100 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-coolgray-200 border border-gray-200 dark:border-gray-700"
+                                        @click="envOpen = !envOpen">
                                         <div class="flex items-center space-x-3">
+                                            <button class="p-1 rounded transition-transform"
+                                                :class="{ 'rotate-90': envOpen }">
+                                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg"
+                                                    viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd"
+                                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" />
+                                                </svg>
+                                            </button>
                                             <h4 class="text-lg font-semibold text-gray-900 dark:text-white">
-                                                {{ $environment->name }}
-                                            </h4>
+                                                {{ $environment->name }}</h4>
                                             <span
-                                                class="px-2 py-1 text-xs rounded-full bg-gray-200 dark:bg-coolgray-300 text-gray-700 dark:text-gray-300">
+                                                class="px-2 py-1 text-xs rounded-full bg-gray-100 dark:bg-coolgray-200 text-gray-700 dark:text-gray-300">
                                                 Environment
                                             </span>
                                         </div>
                                     </div>
 
-                                    <div class="space-y-6">
+                                    {{-- Environment Content --}}
+                                    <div x-show="envOpen" x-collapse class="mt-2 space-y-3 pl-8">
                                         {{-- Applications Section --}}
-                                        <div class="bg-white dark:bg-coolgray-100 rounded-lg p-4">
-                                            <div class="flex items-center justify-between mb-3">
+                                        <div
+                                            class="bg-white dark:bg-coolgray-100 rounded-lg border border-gray-200 dark:border-gray-700">
+                                            <div class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-coolgray-200"
+                                                @click.stop="applicationsOpen = !applicationsOpen">
                                                 <h5 class="font-medium text-gray-900 dark:text-white">Applications</h5>
-                                                <span
-                                                    class="text-sm text-gray-500">{{ $environment->applications->count() }}
-                                                    total</span>
+                                                <div class="flex items-center space-x-2">
+                                                    <span
+                                                        class="text-sm text-gray-500">{{ $environment->applications->count() }}
+                                                        total</span>
+                                                    <button class="p-1 rounded transition-transform"
+                                                        :class="{ 'rotate-90': applicationsOpen }">
+                                                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg"
+                                                            viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd"
+                                                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div class="space-y-2">
-                                                @forelse ($environment->applications->sortBy('name') as $application)
-                                                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-coolgray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-coolgray-300 transition-colors cursor-pointer"
-                                                        onclick="gotoApplication('{{ $project->uuid }}','{{ $environment->name }}','{{ $application->uuid }}')">
-                                                        <div class="flex items-center space-x-3">
-                                                            <div
-                                                                class="w-2 h-2 rounded-full {{ $application->status === 'running' ? 'bg-green-500' : 'bg-red-500' }}">
+                                            <div x-show="applicationsOpen" x-collapse
+                                                class="border-t border-gray-200 dark:border-gray-700">
+                                                <div class="p-4 space-y-2">
+                                                    @forelse ($environment->applications->sortBy('name') as $application)
+                                                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-coolgray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-coolgray-300 transition-colors cursor-pointer"
+                                                            onclick="gotoApplication('{{ $project->uuid }}','{{ $environment->name }}','{{ $application->uuid }}')">
+                                                            <div class="flex items-center space-x-3">
+                                                                <div
+                                                                    class="w-2 h-2 rounded-full {{ $application->status === 'running' ? 'bg-green-500' : 'bg-red-500' }}">
+                                                                </div>
+                                                                <span
+                                                                    class="font-medium">{{ $application->name }}</span>
                                                             </div>
-                                                            <span class="font-medium">{{ $application->name }}</span>
+                                                            <div class="flex items-center space-x-3">
+                                                                <span
+                                                                    class="text-sm px-2 py-1 rounded-full {{ $application->status === 'running' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                                                    {{ $application->status }}
+                                                                </span>
+                                                            </div>
                                                         </div>
-                                                        <div class="flex items-center space-x-3">
-                                                            <span
-                                                                class="text-sm px-2 py-1 rounded-full {{ $application->status === 'running' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                                                {{ $application->status }}
-                                                            </span>
+                                                    @empty
+                                                        <div class="text-center py-4 text-gray-500">
+                                                            <p>No applications found</p>
                                                         </div>
-                                                    </div>
-                                                @empty
-                                                    <div class="text-center py-4 text-gray-500">
-                                                        <p>No applications found</p>
-                                                    </div>
-                                                @endforelse
+                                                    @endforelse
+                                                </div>
                                             </div>
                                         </div>
 
                                         {{-- Services Section --}}
-                                        <div class="bg-white dark:bg-coolgray-100 rounded-lg p-4">
-                                            <div class="flex items-center justify-between mb-3">
+                                        <div
+                                            class="bg-white dark:bg-coolgray-100 rounded-lg border border-gray-200 dark:border-gray-700">
+                                            <div class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-coolgray-200"
+                                                @click.stop="servicesOpen = !servicesOpen">
                                                 <h5 class="font-medium text-gray-900 dark:text-white">Services</h5>
-                                                <span
-                                                    class="text-sm text-gray-500">{{ $environment->services->count() }}
-                                                    total</span>
+                                                <div class="flex items-center space-x-2">
+                                                    <span
+                                                        class="text-sm text-gray-500">{{ $environment->services->count() }}
+                                                        total</span>
+                                                    <button class="p-1 rounded transition-transform"
+                                                        :class="{ 'rotate-90': servicesOpen }">
+                                                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg"
+                                                            viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd"
+                                                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div class="grid gap-2 md:grid-cols-2">
-                                                @forelse ($environment->services as $service)
-                                                    <div
-                                                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-coolgray-200 rounded-lg group hover:bg-gray-100 dark:hover:bg-coolgray-300 transition-colors">
-                                                        <div class="flex items-center space-x-3">
-                                                            <span
-                                                                class="text-gray-700 dark:text-gray-300">{{ $service->name }}</span>
-                                                        </div>
+                                            <div x-show="servicesOpen" x-collapse
+                                                class="border-t border-gray-200 dark:border-gray-700">
+                                                <div class="p-4 grid gap-2 md:grid-cols-2">
+                                                    @forelse ($environment->services as $service)
                                                         <div
-                                                            class="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <button
-                                                                class="p-1 hover:bg-gray-200 dark:hover:bg-coolgray-400 rounded">
-                                                                <svg class="w-4 h-4" viewBox="0 0 20 20"
-                                                                    fill="currentColor">
-                                                                    <path
-                                                                        d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793z" />
-                                                                </svg>
-                                                            </button>
+                                                            class="flex items-center justify-between p-3 bg-gray-50 dark:bg-coolgray-200 rounded-lg group hover:bg-gray-100 dark:hover:bg-coolgray-300 transition-colors">
+                                                            <div class="flex items-center space-x-3">
+                                                                <span
+                                                                    class="text-gray-700 dark:text-gray-300">{{ $service->name }}</span>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                @empty
-                                                    <div class="col-span-2 text-center py-4 text-gray-500">
-                                                        <p>No services found</p>
-                                                    </div>
-                                                @endforelse
+                                                    @empty
+                                                        <div class="col-span-2 text-center py-4 text-gray-500">
+                                                            <p>No services found</p>
+                                                        </div>
+                                                    @endforelse
+                                                </div>
                                             </div>
                                         </div>
 
-                                        {{-- Databases Section --}}
-                                        <div class="bg-white dark:bg-coolgray-100 rounded-lg p-4">
-                                            <div class="flex items-center justify-between mb-3">
+                                        {{-- Databases Section (similar structure to Services) --}}
+                                        <div
+                                            class="bg-white dark:bg-coolgray-100 rounded-lg border border-gray-200 dark:border-gray-700">
+                                            <div class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-coolgray-200"
+                                                @click.stop="databasesOpen = !databasesOpen">
                                                 <h5 class="font-medium text-gray-900 dark:text-white">Databases</h5>
-                                                <span
-                                                    class="text-sm text-gray-500">{{ $environment->databases()->count() }}
-                                                    total</span>
+                                                <div class="flex items-center space-x-2">
+                                                    <span
+                                                        class="text-sm text-gray-500">{{ $environment->databases()->count() }}
+                                                        total</span>
+                                                    <button class="p-1 rounded transition-transform"
+                                                        :class="{ 'rotate-90': databasesOpen }">
+                                                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg"
+                                                            viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd"
+                                                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div class="grid gap-2 md:grid-cols-2">
-                                                @forelse ($environment->databases() as $database)
-                                                    <div
-                                                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-coolgray-200 rounded-lg group hover:bg-gray-100 dark:hover:bg-coolgray-300 transition-colors">
-                                                        <div class="flex items-center space-x-3">
-                                                            <span
-                                                                class="text-gray-700 dark:text-gray-300">{{ $database->name }}</span>
+                                            <div x-show="databasesOpen" x-collapse
+                                                class="border-t border-gray-200 dark:border-gray-700">
+                                                <div class="p-4 grid gap-2 md:grid-cols-2">
+                                                    @forelse ($environment->databases() as $database)
+                                                        <div
+                                                            class="flex items-center justify-between p-3 bg-gray-50 dark:bg-coolgray-200 rounded-lg group hover:bg-gray-100 dark:hover:bg-coolgray-300 transition-colors">
+                                                            <div class="flex items-center space-x-3">
+                                                                <span
+                                                                    class="text-gray-700 dark:text-gray-300">{{ $database->name }}</span>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                @empty
-                                                    <div class="col-span-2 text-center py-4 text-gray-500">
-                                                        <p>No databases found</p>
-                                                    </div>
-                                                @endforelse
+                                                    @empty
+                                                        <div class="col-span-2 text-center py-4 text-gray-500">
+                                                            <p>No databases found</p>
+                                                        </div>
+                                                    @endforelse
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
