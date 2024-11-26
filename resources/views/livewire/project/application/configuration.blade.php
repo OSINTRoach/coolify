@@ -91,6 +91,13 @@
             <a class="menu-item" :class="activeTab === 'danger' && 'menu-item-active'"
                 @click.prevent="activeTab = 'danger'; window.location.hash = 'danger'" href="#">Danger Zone
             </a>
+            @if ($application->is_github_based() || $application->is_gitlab_based())
+                <a class="menu-item" :class="activeTab === 'git-activity' && 'menu-item-active'"
+                    @click.prevent="activeTab = 'git-activity'; window.location.hash = 'git-activity'"
+                    href="#">Git
+                    Activity
+                </a>
+            @endif
         </div>
         <div class="w-full">
             <div x-cloak x-show="activeTab === 'general'" class="h-full">
@@ -146,6 +153,11 @@
             <div x-cloak x-show="activeTab === 'danger'">
                 <livewire:project.shared.danger :resource="$application" />
             </div>
+            @if ($application->is_github_based() || $application->is_gitlab_based())
+                <div x-cloak x-show="activeTab === 'git-activity'">
+                    <livewire:project.application.git-activity :application="$application" />
+                </div>
+            @endif
         </div>
     </div>
 </div>
