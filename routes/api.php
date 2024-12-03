@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\ResourcesController;
 use App\Http\Controllers\Api\SecurityController;
 use App\Http\Controllers\Api\ServersController;
+use App\Http\Controllers\Api\DockerController;
 use App\Http\Controllers\Api\ServicesController;
 use App\Http\Controllers\Api\TeamController;
 use App\Http\Middleware\ApiAllowed;
@@ -68,6 +69,9 @@ Route::group([
     Route::post('/servers', [ServersController::class, 'create_server']);
     Route::patch('/servers/{uuid}', [ServersController::class, 'update_server']);
     Route::delete('/servers/{uuid}', [ServersController::class, 'delete_server']);
+
+    Route::get('/docker/images/{server_uuid}', [DockerController::class, 'listImages']);
+    Route::get('/docker/images/{server_uuid}/{image_id}', [DockerController::class, 'getImageDetails']);
 
     Route::get('/resources', [ResourcesController::class, 'resources']);
 
